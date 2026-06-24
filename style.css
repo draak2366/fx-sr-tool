@@ -1,0 +1,69 @@
+/* ===== FX S/Rライン分析ツール ダークテーマ ===== */
+:root{
+  --bg:#0e1420; --panel:#161e2e; --panel2:#1d2740; --ink:#e7ecf5; --sub:#8a97ad;
+  --line:#26324a; --up:#26c281; --down:#ff5d6c; --accent:#3b82f6; --gold:#f5b942;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.6;
+  font-family:system-ui,-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:720px;margin:0 auto;padding:16px 14px 50px}
+a{color:var(--accent)}
+
+.head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.head h1{font-size:1.15rem;margin:0}
+.pair{font-weight:800;color:var(--accent)}
+.price-box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:12px 0;text-align:center}
+.price-box .label{font-size:.78rem;color:var(--sub)}
+.price-box .price{font-size:2.4rem;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.price-box .updated{font-size:.74rem;color:var(--sub);margin-top:4px}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0}
+.panel h2{font-size:.95rem;margin:0 0 10px;color:var(--ink)}
+
+/* 合流 */
+.conf-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;border-radius:10px;background:var(--panel2);margin-bottom:8px;font-size:.9rem}
+.conf-item:last-child{margin-bottom:0}
+.conf-price{font-weight:800;font-variant-numeric:tabular-nums}
+.conf-tfs{font-size:.74rem;color:var(--sub)}
+.side-R{color:var(--down)} .side-S{color:var(--up)}
+.badge-conf{display:inline-block;background:var(--accent);color:#fff;font-size:.68rem;font-weight:700;border-radius:6px;padding:1px 7px;margin-left:6px}
+
+/* TFタブ */
+.tabs{display:flex;gap:6px;overflow-x:auto;margin:10px 0}
+.tabs button{white-space:nowrap;padding:8px 14px;border:1px solid var(--line);background:var(--panel);color:var(--sub);border-radius:999px;cursor:pointer;font-size:.85rem;font-weight:700}
+.tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* S/Rラダー */
+.ladder{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:42px 1fr auto auto;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;background:var(--panel2);font-variant-numeric:tabular-nums}
+.row .tag{font-size:.72rem;font-weight:800;padding:2px 6px;border-radius:6px;text-align:center}
+.row.r .tag{background:rgba(255,93,108,.18);color:var(--down)}
+.row.s .tag{background:rgba(38,194,129,.18);color:var(--up)}
+.row.now{background:linear-gradient(90deg,rgba(59,130,246,.22),rgba(59,130,246,.05));border:1px solid var(--accent)}
+.row.now .tag{background:var(--accent);color:#fff}
+.row .lp{font-weight:800;font-size:1.05rem}
+.row .stars{color:var(--gold);font-size:.85rem;letter-spacing:1px}
+.row .dist{font-size:.78rem;color:var(--sub);text-align:right}
+.row.now .lp{color:var(--accent)}
+.touch-badge{display:inline-block;background:var(--gold);color:#1a1207;font-size:.66rem;font-weight:800;border-radius:5px;padding:1px 6px;margin-left:6px}
+.empty{color:var(--sub);font-size:.85rem;text-align:center;padding:10px}
+
+.legend{font-size:.76rem;color:var(--sub);margin-top:10px;line-height:1.7}
+.btn{display:inline-block;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-weight:700;cursor:pointer;font-size:.85rem}
+.disc{font-size:.74rem;color:var(--sub);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:20px;line-height:1.7}
+.foot{text-align:center;font-size:.74rem;color:var(--sub);margin-top:16px}
+.foot a{color:var(--sub)}
+.sample-note{background:rgba(245,185,66,.12);border:1px solid rgba(245,185,66,.4);color:var(--gold);font-size:.78rem;border-radius:10px;padding:9px 12px;margin:10px 0}
+
+/* 全体ビュー（全TF一覧テーブル） */
+.alltf-wrap{overflow-x:auto;margin-top:4px}
+table.alltf{border-collapse:collapse;width:100%;min-width:500px;font-variant-numeric:tabular-nums;font-size:.85rem}
+table.alltf th,table.alltf td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+table.alltf thead th{color:var(--sub);font-weight:700;font-size:.74rem;border-bottom:1px solid var(--line)}
+table.alltf th.cR{color:var(--down)} table.alltf th.cS{color:var(--up)}
+table.alltf .tf-cell{font-weight:800;color:var(--ink);text-align:left}
+table.alltf td.cR .px{color:var(--down)} table.alltf td.cS .px{color:var(--up)}
+table.alltf .px{font-weight:700}
+table.alltf .st{display:block;color:var(--gold);font-size:.64rem;line-height:1.1;margin-top:1px}
+table.alltf td.mid{background:rgba(59,130,246,.14);color:var(--accent);font-weight:800}
+.touch-dot{display:inline-block;font-size:.6rem;background:var(--gold);color:#1a1207;border-radius:4px;padding:0 5px;margin-left:5px;font-weight:800;vertical-align:middle}

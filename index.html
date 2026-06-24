@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>USD/JPY S/Rライン分析ツール｜サポート・レジスタンスを自動表示【無料】</title>
+<meta name="description" content="USD/JPYのサポート・レジスタンスライン（S/R）を複数時間足で自動検出。スイング高安からR1/R2・S1/S2・★強度・マルチTF合流を表示する、ライントレードの分析補助ツールです。">
+<meta name="robots" content="index,follow">
+<meta property="og:title" content="USD/JPY S/Rライン分析ツール">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="style.css">
+<!-- ▼ AdSenseは審査通過後にここへ ▼ -->
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <h1>📈 <span class="pair">USD/JPY</span> S/Rライン分析</h1>
+  </div>
+
+  <div class="sample-note" id="sample-note" style="display:none">⚠️ 実データを取得できないため、サンプルで表示しています。</div>
+
+  <div class="price-box">
+    <div class="label">現在値（USD/JPY）</div>
+    <div class="price" id="cur-price">—</div>
+    <div class="updated" id="updated">読み込み中…</div>
+  </div>
+
+  <div style="text-align:center;margin:10px 0">
+    <button class="btn" id="refresh">🔄 更新</button>
+  </div>
+
+  <!-- 合流ライン -->
+  <div class="panel">
+    <h2>🔗 マルチTF合流ライン（強い順）</h2>
+    <div id="confluence"></div>
+  </div>
+
+  <!-- TFタブ＋ラダー -->
+  <div class="panel">
+    <h2>📊 時間足別 S/Rライン</h2>
+    <div class="tabs" id="tabs"></div>
+    <div class="ladder" id="ladder"></div>
+    <div class="legend">
+      ★＝ライン強度（直近性×タッチ数）／<span style="color:var(--accent)">合流</span>＝複数時間足が重なる強いゾーン／pips＝現在値からの距離
+    </div>
+  </div>
+
+  <div class="disc">
+    <b>免責：</b>本ツールはチャート分析を補助する目的の情報提供であり、売買の助言・推奨ではありません。表示されるライン・強度はスイング高安をもとに自動算出した目安です。エントリー・利確・損切りなどの最終判断はご自身の責任で行ってください。投資にはリスクがあり、損失が生じる可能性があります。
+  </div>
+
+  <div class="foot">
+    <p>© 2026 USD/JPY S/Rライン分析ツール</p>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="sr-engine.js"></script>
+<script src="sample-data.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+let currentTf = "all";
+let lastResult = null;
+
+function stars(rank){ return "★".repeat(rank) + "☆".repeat(3 - rank); }
+
+function renderPrice(result){
+  $("cur-price").textContent = result.price != null ? result.price.toFixed(3) : "—";
+  const t = result.updated ? new Date(result.updated) : new Date();
+  $("updated").textContent = "更新: " + t.toLocaleString("ja-JP");
+}
+
+function renderConfluence(result){
+  const box = $("confluence");
+  const list = result.confluence || [];
+  if(!list.length){ box.innerHTML = '<div class="empty">現在、複数時間足が重なる合流ラインはありません。</div>'; return; }
+  box.innerHTML = list.map(c => `
+    <div class="conf-item">
+      <div>
+        <span class="conf-price side-${c.side}">${c.price.toFixed(3)}</span>
+        <span class="badge-conf">${c.count}TF合流</span>
+        <span class="side-${c.side}" style="font-size:.78rem;margin-left:6px">${c.side === "R" ? "上の抵抗" : "下の支持"}</span>
+      </div>
+      <div style="text-align:right">
+        <div class="conf-tfs">${c.tfs.join(" / ")}</div>
+        <div class="conf-tfs">${c.dist} pips</div>
+      </div>
+    </div>`).join("");
+}
+
+function renderTabs(){
+  const tabs = ["all", ...SREngine.TF_ORDER];
+  $("tabs").innerHTML = tabs.map(tf =>
+    `<button data-tf="${tf}" class="${tf===currentTf?'active':''}">${tf==='all'?'全体':tf}</button>`).join("");
+  $("tabs").querySelectorAll("button").forEach(b=>{
+    b.addEventListener("click", ()=>{ currentTf = b.dataset.tf; renderTabs(); renderLadder(); });
+  });
+}
+
+// 全TF一覧テーブル
+function allCell(d, cls){
+  if(!d) return `<td class="${cls}" style="color:var(--sub)">—</td>`;
+  return `<td class="${cls}"><span class="px">${d.price.toFixed(3)}</span><span class="st">${"★".repeat(d.rank)}${d.conf>=2?" 合"+d.conf:""}</span></td>`;
+}
+function renderAll(){
+  let html = '<div class="alltf-wrap"><table class="alltf"><thead><tr>'
+    + '<th>足</th><th class="cS">S2</th><th class="cS">S1</th><th>現在</th><th class="cR">R1</th><th class="cR">R2</th>'
+    + '</tr></thead><tbody>';
+  for(const tf of SREngine.TF_ORDER){
+    const d = lastResult.timeframes[tf];
+    if(!d){ html += `<tr><td class="tf-cell">${tf}</td><td colspan="5" style="color:var(--sub)">データ不足</td></tr>`; continue; }
+    const touch = d.touch ? `<span class="touch-dot">接触${d.touch.side}</span>` : "";
+    html += `<tr><td class="tf-cell">${tf}${touch}</td>`
+      + allCell(d.s2,"cS") + allCell(d.s1,"cS")
+      + `<td class="mid">${lastResult.price.toFixed(3)}</td>`
+      + allCell(d.r1,"cR") + allCell(d.r2,"cR") + "</tr>";
+  }
+  html += "</tbody></table></div>";
+  $("ladder").innerHTML = html;
+}
+
+function srRow(tag, cls, data){
+  if(!data) return `<div class="row ${cls}"><span class="tag">${tag}</span><span class="lp" style="color:var(--sub)">—</span><span></span><span class="dist"></span></div>`;
+  const conf = data.conf >= 2 ? `<span class="badge-conf">合流${data.conf}</span>` : "";
+  return `<div class="row ${cls}">
+    <span class="tag">${tag}</span>
+    <span class="lp">${data.price.toFixed(3)}${conf}</span>
+    <span class="stars">${stars(data.rank)}</span>
+    <span class="dist">${data.dist}pips</span>
+  </div>`;
+}
+
+function renderLadder(){
+  if(!lastResult){ return; }
+  if(currentTf === "all"){ renderAll(); return; }
+  const tf = lastResult.timeframes[currentTf];
+  const box = $("ladder");
+  if(!tf){ box.innerHTML = '<div class="empty">この時間足はデータ不足です。</div>'; return; }
+  const touchBadge = tf.touch ? `<span class="touch-badge">接触中 ${tf.touch.side}</span>` : "";
+  box.innerHTML =
+    srRow("R2","r",tf.r2) +
+    srRow("R1","r",tf.r1) +
+    `<div class="row now"><span class="tag">現在</span><span class="lp">${lastResult.price.toFixed(3)}${touchBadge}</span><span></span><span class="dist">USD/JPY</span></div>` +
+    srRow("S1","s",tf.s1) +
+    srRow("S2","s",tf.s2);
+}
+
+function render(result){
+  lastResult = result;
+  renderPrice(result);
+  renderConfluence(result);
+  renderLadder();
+}
+
+// データ取得：① config.dataUrl(GitHub raw) → ② ローカルsr.json → ③ サンプル
+async function loadData(){
+  const bucket = Math.floor(Date.now() / 300000); // 5分バケツ（rawのキャッシュに合わせる）
+  const sources = [];
+  if (window.SR_CONFIG && SR_CONFIG.dataUrl) sources.push(SR_CONFIG.dataUrl + "?v=" + bucket);
+  sources.push("sr.json?t=" + Date.now());
+  for (const url of sources){
+    try{
+      const res = await fetch(url, { cache: "no-store" });
+      if(!res.ok) continue;
+      const data = await res.json();
+      if(data && data.price != null){ $("sample-note").style.display = "none"; render(data); return; }
+    }catch(e){ /* 次のソースへ */ }
+  }
+  // フォールバック：サンプル生成
+  $("sample-note").style.display = "block";
+  const { rates, currentPrice } = SampleData.generate(Math.floor(Math.random()*100000));
+  render(SREngine.getSrLines("USD/JPY", rates, currentPrice));
+}
+
+$("refresh").addEventListener("click", loadData);
+renderTabs();
+loadData();
+setInterval(loadData, 5 * 60 * 1000);  // 5分ごとに自動更新
+</script>
+</body>
+</html>

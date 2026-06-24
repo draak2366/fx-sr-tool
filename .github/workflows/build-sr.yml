@@ -1,0 +1,40 @@
+name: build-sr
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # 5分ごと（GitHub都合で多少遅延・スキップあり）
+  workflow_dispatch: {}      # 手動実行も可
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-sr
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate sr.json
+        env:
+          TWELVEDATA_KEY: ${{ secrets.TWELVEDATA_KEY }}
+        run: node build-sr.js
+
+      - name: Commit sr.json if changed
+        run: |
+          git config user.name "sr-bot"
+          git config user.email "sr-bot@users.noreply.github.com"
+          git add sr.json
+          if git diff --staged --quiet; then
+            echo "no change"
+          else
+            git commit -m "update sr.json [skip ci]"
+            git push
+          fi
