@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>改善案・お問い合わせ｜USD/JPY S/Rライン分析ツール</title>
+<meta name="description" content="USD/JPY S/Rライン分析ツールへの改善案・ご要望・お問い合わせはこちらのフォームから。いただいたご意見はツールの改善に役立てます。">
+<meta name="robots" content="index,follow">
+<link rel="stylesheet" href="style.css">
+<!-- ▼ AdSenseは審査通過後にここへ ▼ -->
+</head>
+<body>
+<div class="wrap article">
+
+  <nav class="topnav">
+    <a href="index.html">📈 ツール</a>
+    <a href="guide.html">使い方・見方</a>
+    <a href="contact.html" class="cur">改善・問い合わせ</a>
+    <a href="about.html">運営者情報</a>
+    <a href="privacy.html">プライバシー</a>
+  </nav>
+
+  <h1>改善案・お問い合わせ</h1>
+  <p class="lead">「こんな機能がほしい」「ここが分かりにくい」「他の通貨ペアも見たい」など、改善のご意見・ご要望を歓迎します。不具合の報告もこちらからどうぞ。いただいた内容は今後のツール改善に活用します。</p>
+
+  <div class="callout">
+    <b>送信について：</b>このフォームの内容は運営者にのみ届きます。返信が必要な場合はメールアドレスをご記入ください（任意）。個人情報の取り扱いは<a href="privacy.html" style="color:var(--accent)">プライバシーポリシー</a>をご確認ください。
+  </div>
+
+  <!-- Netlify Forms：静的サイトでも送信を受け取れます -->
+  <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/thanks.html">
+    <input type="hidden" name="form-name" value="contact">
+    <p style="display:none"><label>これは記入しないでください：<input name="bot-field"></label></p>
+
+    <div class="field">
+      <label for="kind">種類</label>
+      <select id="kind" name="種類">
+        <option>改善案・ご要望</option>
+        <option>不具合の報告</option>
+        <option>表示内容についての質問</option>
+        <option>その他</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="email">メールアドレス（返信が必要な場合のみ・任意）</label>
+      <input type="email" id="email" name="email" placeholder="example@example.com">
+    </div>
+
+    <div class="field">
+      <label for="message">内容 <span style="color:var(--down)">*</span></label>
+      <textarea id="message" name="内容" required placeholder="ご意見・ご要望・不具合の内容をご記入ください。"></textarea>
+    </div>
+
+    <button type="submit" class="submit">送信する</button>
+  </form>
+
+  <p style="margin-top:20px;font-size:.82rem;color:var(--sub)">※ すべてのご意見に個別返信できるとは限りません。あらかじめご了承ください。</p>
+
+  <div class="foot">
+    <p><a href="index.html">ツール</a> ・ <a href="guide.html">使い方・見方</a> ・ <a href="about.html">運営者情報</a> ・ <a href="privacy.html">プライバシーポリシー</a></p>
+    <p>© 2026 USD/JPY S/Rライン分析ツール</p>
+  </div>
+</div>
+</body>
+</html>

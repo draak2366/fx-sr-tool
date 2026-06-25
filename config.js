@@ -11,5 +11,6 @@
    空文字のままなら、同じフォルダのローカル sr.json を読む（開発用）。
    ========================================================= */
 window.SR_CONFIG = {
-  dataUrl: "https://raw.githubusercontent.com/draak2366/fx-sr-tool/main/sr.json"
+  dataUrl: "https://raw.githubusercontent.com/draak2366/fx-sr-tool/main/sr.json",
+  candlesUrl: "https://raw.githubusercontent.com/draak2366/fx-sr-tool/main/candles.json"
 };

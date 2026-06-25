@@ -67,3 +67,42 @@ table.alltf .px{font-weight:700}
 table.alltf .st{display:block;color:var(--gold);font-size:.64rem;line-height:1.1;margin-top:1px}
 table.alltf td.mid{background:rgba(59,130,246,.14);color:var(--accent);font-weight:800}
 .touch-dot{display:inline-block;font-size:.6rem;background:var(--gold);color:#1a1207;border-radius:4px;padding:0 5px;margin-left:5px;font-weight:800;vertical-align:middle}
+
+/* チャート */
+.chart-panel{margin:8px 0 10px}
+#chart{height:300px;width:100%}
+.chart-note{font-size:.76rem;color:var(--sub);text-align:center;padding:8px}
+
+/* 共通ナビ */
+.topnav{display:flex;gap:4px;flex-wrap:wrap;margin:0 0 12px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.topnav a{color:var(--sub);text-decoration:none;font-size:.82rem;font-weight:700;padding:5px 10px;border-radius:8px}
+.topnav a:hover{background:var(--panel2);color:var(--ink)}
+.topnav a.cur{background:var(--accent);color:#fff}
+
+/* 更新ペースの注記 */
+.pace{font-size:.74rem;color:var(--sub);text-align:center;margin:4px 0 0}
+.pace b{color:var(--gold)}
+
+/* 記事ページ */
+.article h1{font-size:1.4rem;margin:6px 0 4px}
+.article h2{font-size:1.05rem;margin:26px 0 8px;padding-left:10px;border-left:3px solid var(--accent)}
+.article h3{font-size:.95rem;margin:18px 0 6px;color:var(--ink)}
+.article p,.article li{font-size:.9rem;color:#cdd6e6}
+.article ul,.article ol{padding-left:22px}
+.article li{margin:5px 0}
+.article .lead{color:var(--sub);font-size:.92rem}
+.callout{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.35);border-radius:12px;padding:14px 16px;margin:16px 0}
+.callout.warn{background:rgba(245,185,66,.1);border-color:rgba(245,185,66,.4)}
+.callout.key{background:rgba(38,194,129,.08);border-color:rgba(38,194,129,.4)}
+.callout b{color:var(--ink)}
+.deftable{width:100%;border-collapse:collapse;margin:12px 0;font-size:.86rem}
+.deftable th,.deftable td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+.deftable th{background:var(--panel2);color:var(--sub);white-space:nowrap}
+.cta-link{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;padding:10px 18px;border-radius:10px;font-weight:700;font-size:.88rem;margin-top:8px}
+
+/* フォーム */
+.field{margin:14px 0}
+.field label{display:block;font-size:.84rem;color:var(--sub);font-weight:700;margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:11px 12px;font-size:.9rem;font-family:inherit}
+.field textarea{min-height:130px;resize:vertical}
+.submit{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px 22px;font-weight:800;font-size:.92rem;cursor:pointer}

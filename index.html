@@ -14,6 +14,14 @@
 <body>
 <div class="wrap">
 
+  <nav class="topnav">
+    <a href="index.html" class="cur">📈 ツール</a>
+    <a href="guide.html">使い方・見方</a>
+    <a href="contact.html">改善・問い合わせ</a>
+    <a href="about.html">運営者情報</a>
+    <a href="privacy.html">プライバシー</a>
+  </nav>
+
   <div class="head">
     <h1>📈 <span class="pair">USD/JPY</span> S/Rライン分析</h1>
   </div>
@@ -24,6 +32,7 @@
     <div class="label">現在値（USD/JPY）</div>
     <div class="price" id="cur-price">—</div>
     <div class="updated" id="updated">読み込み中…</div>
+    <p class="pace">データは約<b>5分ごと</b>に自動更新（リアルタイムではありません）／<a href="guide.html" style="color:var(--accent)">使い方を見る</a></p>
   </div>
 
   <div style="text-align:center;margin:10px 0">
@@ -40,9 +49,17 @@
   <div class="panel">
     <h2>📊 時間足別 S/Rライン</h2>
     <div class="tabs" id="tabs"></div>
+
+    <!-- チャート（個別TF選択時のみ表示）-->
+    <div class="chart-panel" id="chart-panel" style="display:none">
+      <div id="chart"></div>
+      <div class="chart-note" id="chart-note"></div>
+    </div>
+
     <div class="ladder" id="ladder"></div>
     <div class="legend">
-      ★＝ライン強度（直近性×タッチ数）／<span style="color:var(--accent)">合流</span>＝複数時間足が重なる強いゾーン／pips＝現在値からの距離
+      ★＝ライン強度（直近性×タッチ数）／<span style="color:var(--accent)">合流</span>＝複数時間足が重なる強いゾーン／pips＝現在値からの距離<br>
+      チャートのローソク足は約5分ごとに更新（個別の時間足タブで表示）。
     </div>
   </div>
 
@@ -51,10 +68,12 @@
   </div>
 
   <div class="foot">
+    <p><a href="guide.html">使い方・見方</a> ・ <a href="contact.html">改善・問い合わせ</a> ・ <a href="about.html">運営者情報</a> ・ <a href="privacy.html">プライバシーポリシー</a></p>
     <p>© 2026 USD/JPY S/Rライン分析ツール</p>
   </div>
 </div>
 
+<script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
 <script src="config.js"></script>
 <script src="sr-engine.js"></script>
 <script src="sample-data.js"></script>
@@ -131,9 +150,86 @@ function srRow(tag, cls, data){
   </div>`;
 }
 
+// ===== チャート（Lightweight Charts）=====
+let _chart=null, _series=null, _priceLines=[], _candlesCache=null;
+
+async function ensureCandles(){
+  if(_candlesCache) return _candlesCache;
+  const bucket = Math.floor(Date.now()/300000);
+  const sources = [];
+  if(window.SR_CONFIG && SR_CONFIG.candlesUrl) sources.push(SR_CONFIG.candlesUrl + "?v=" + bucket);
+  sources.push("candles.json?t=" + Date.now());
+  for(const url of sources){
+    try{
+      const res = await fetch(url, {cache:"no-store"});
+      if(!res.ok) continue;
+      const data = await res.json();
+      if(data && data["1h"]){ _candlesCache = data; return data; }
+    }catch(e){}
+  }
+  return null;
+}
+
+function buildChart(){
+  if(_chart || typeof LightweightCharts === "undefined") return;
+  _chart = LightweightCharts.createChart($("chart"), {
+    autoSize:true,
+    layout:{ background:{type:'solid',color:'transparent'}, textColor:'#8a97ad', fontFamily:'inherit' },
+    grid:{ vertLines:{color:'rgba(38,50,74,.45)'}, horzLines:{color:'rgba(38,50,74,.45)'} },
+    rightPriceScale:{ borderColor:'#26324a' },
+    timeScale:{ borderColor:'#26324a', timeVisible:true, secondsVisible:false },
+    localization:{ priceFormatter:p=>p.toFixed(3) },
+  });
+  _series = _chart.addCandlestickSeries({
+    upColor:'#26c281', downColor:'#ff5d6c', borderUpColor:'#26c281', borderDownColor:'#ff5d6c',
+    wickUpColor:'#26c281', wickDownColor:'#ff5d6c',
+    priceFormat:{ type:'price', precision:3, minMove:0.001 },
+  });
+}
+
+function clearPriceLines(){
+  if(!_series) return;
+  _priceLines.forEach(pl=>{ try{ _series.removePriceLine(pl); }catch(e){} });
+  _priceLines = [];
+}
+function addLine(d, color, label){
+  if(!d || !_series) return;
+  _priceLines.push(_series.createPriceLine({
+    price:d.price, color:color, lineWidth:1, lineStyle:0,
+    axisLabelVisible:true, title:`${label} ${"★".repeat(d.rank)}${d.conf>=2?" 合"+d.conf:""}`,
+  }));
+}
+
+async function drawChart(tfLabel){
+  const panel = $("chart-panel"), note = $("chart-note");
+  panel.style.display = "block";
+  if($("sample-note").style.display === "block"){
+    $("chart").style.display = "none"; note.textContent = "サンプル表示中はチャート非対応です。"; return;
+  }
+  const data = await ensureCandles();
+  if(!data || !data[tfLabel] || !data[tfLabel].length){
+    $("chart").style.display = "none"; note.textContent = "チャートデータを取得できませんでした。"; return;
+  }
+  buildChart();
+  if(!_series){ $("chart").style.display="none"; note.textContent = "チャート描画を読み込めませんでした。"; return; }
+  $("chart").style.display = "block"; note.textContent = "";
+  _series.setData(data[tfLabel]);
+  clearPriceLines();
+  const tf = lastResult.timeframes[tfLabel];
+  if(tf){
+    addLine(tf.r2,'#ff5d6c','R2'); addLine(tf.r1,'#ff5d6c','R1');
+    addLine(tf.s1,'#26c281','S1'); addLine(tf.s2,'#26c281','S2');
+    if(lastResult.price!=null){
+      _priceLines.push(_series.createPriceLine({ price:lastResult.price, color:'#3b82f6', lineWidth:1, lineStyle:2, axisLabelVisible:true, title:'現在' }));
+    }
+  }
+  _chart.timeScale().fitContent();
+}
+
 function renderLadder(){
   if(!lastResult){ return; }
-  if(currentTf === "all"){ renderAll(); return; }
+  if(currentTf === "all"){ $("chart-panel").style.display = "none"; renderAll(); return; }
+  drawChart(currentTf);
   const tf = lastResult.timeframes[currentTf];
   const box = $("ladder");
   if(!tf){ box.innerHTML = '<div class="empty">この時間足はデータ不足です。</div>'; return; }
