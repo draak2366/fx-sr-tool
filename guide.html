@@ -8,6 +8,15 @@
 <meta name="robots" content="index,follow">
 <meta property="og:title" content="使い方・画面の見方｜USD/JPY S/Rライン分析ツール">
 <meta property="og:type" content="article">
+<meta property="og:url" content="https://usdjpy-sr-lines.netlify.app/guide.html">
+<meta property="og:image" content="https://usdjpy-sr-lines.netlify.app/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0e1420">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<link rel="manifest" href="site.webmanifest">
 <link rel="stylesheet" href="style.css">
 <!-- ▼ AdSenseは審査通過後にここへ ▼ -->
 </head>
@@ -83,10 +92,20 @@
 
   <h2 id="pace">6. 更新ペースについて</h2>
   <div class="callout">
-    <b>データは約5分ごとに自動更新されます。</b>画面は開いたままでも自動で更新されます（手動で「🔄更新」を押すこともできます）。
+    <b>画面は約5分ごとに自動で再読み込みされます。</b>現在値と短い時間足は約5分ごとに最新化されます（手動で「🔄更新」を押すこともできます）。
   </div>
+  <p>ただし、データの<b>取得（API更新）の間隔は時間足ごとに異なります</b>。長い時間足は値動きがゆっくりなので、無駄な取得を避けるために更新頻度を落としています（その分、無料データの範囲で長時間の運用を可能にしています）。実際の更新間隔の目安は次のとおりです。</p>
+  <table class="deftable">
+    <tr><th>時間足</th><th>データ更新の目安</th></tr>
+    <tr><td>1分足 / 5分足</td><td>約5分ごと</td></tr>
+    <tr><td>15分足</td><td>約15分ごと</td></tr>
+    <tr><td>1時間足</td><td>約1時間ごと</td></tr>
+    <tr><td>4時間足</td><td>約4時間ごと</td></tr>
+    <tr><td>日足</td><td>約6時間ごと</td></tr>
+  </table>
   <ul>
-    <li>リアルタイム（ティック単位）の配信ではありません。表示価格・ラインは最大で数分前のものになることがあります。</li>
+    <li>長い時間足のラインは、上記の間隔で更新されるまで前回の値のままになります（値動きが遅いため実用上の影響はほとんどありません）。</li>
+    <li>リアルタイム（ティック単位）の配信ではありません。表示価格・ラインは数分前のものになることがあります。</li>
     <li>サーバー混雑などで、まれに更新が数分遅れる・スキップされる場合があります。</li>
     <li>スキャルピングなど秒単位の判断には向きません。実際の発注時は、必ずご利用のFX会社のリアルタイムレートをご確認ください。</li>
   </ul>

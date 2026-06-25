@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1200px;height:630px;overflow:hidden}
+  body{
+    font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",sans-serif;
+    background:
+      radial-gradient(1100px 600px at 78% -8%, rgba(59,130,246,.20), transparent 60%),
+      linear-gradient(135deg,#0e1420 0%,#141d2e 55%,#0b1320 100%);
+    color:#e7ecf5; position:relative;
+  }
+  .wrap{position:absolute;inset:0;padding:64px 70px;display:flex;flex-direction:column;justify-content:space-between}
+  .pair{display:inline-flex;align-items:center;gap:14px;font-size:30px;font-weight:800;color:#3b82f6;letter-spacing:1px}
+  .pair .dot{width:14px;height:14px;border-radius:50%;background:#26c281;box-shadow:0 0 14px #26c281}
+  h1{font-size:84px;line-height:1.08;font-weight:900;margin-top:18px;letter-spacing:-1px}
+  h1 .accent{color:#3b82f6}
+  .sub{font-size:31px;color:#aeb9cc;margin-top:22px;line-height:1.5;font-weight:600}
+  .chips{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+  .chip{font-size:23px;font-weight:700;padding:11px 20px;border-radius:999px;border:1px solid #2b3950;background:rgba(29,39,64,.7)}
+  .chip.r{color:#ff5d6c;border-color:rgba(255,93,108,.5)}
+  .chip.s{color:#26c281;border-color:rgba(38,194,129,.5)}
+  .chip.g{color:#f5b942;border-color:rgba(245,185,66,.5)}
+  .foot{display:flex;align-items:center;justify-content:space-between}
+  .url{font-size:26px;color:#8a97ad;font-weight:700}
+  .free{font-size:24px;font-weight:800;color:#0e1420;background:#f5b942;padding:9px 20px;border-radius:10px}
+
+  /* 右側のS/Rチャート風モチーフ */
+  .chart{position:absolute;right:0;bottom:0;width:520px;height:430px;opacity:.9}
+  .line{position:absolute;left:0;right:0;height:0;border-top:2px dashed;}
+  .lbl{position:absolute;right:14px;font-size:20px;font-weight:800;padding:3px 10px;border-radius:6px;transform:translateY(-50%)}
+</style>
+</head>
+<body>
+  <!-- 右側の装飾チャート -->
+  <svg class="chart" viewBox="0 0 520 430" xmlns="http://www.w3.org/2000/svg">
+    <!-- レジスタンス帯 -->
+    <line x1="20" y1="70" x2="500" y2="70" stroke="#ff5d6c" stroke-width="2" stroke-dasharray="8 7"/>
+    <line x1="20" y1="120" x2="500" y2="120" stroke="#ff5d6c" stroke-width="2" stroke-dasharray="8 7" opacity=".6"/>
+    <!-- 現在値 -->
+    <line x1="20" y1="220" x2="500" y2="220" stroke="#3b82f6" stroke-width="2.5"/>
+    <!-- サポート帯 -->
+    <line x1="20" y1="320" x2="500" y2="320" stroke="#26c281" stroke-width="2" stroke-dasharray="8 7"/>
+    <line x1="20" y1="370" x2="500" y2="370" stroke="#26c281" stroke-width="2" stroke-dasharray="8 7" opacity=".6"/>
+    <!-- ローソク足 -->
+    <g>
+      <rect x="60"  y="150" width="20" height="70"  fill="#26c281"/><line x1="70"  y1="130" x2="70"  y2="240" stroke="#26c281" stroke-width="2"/>
+      <rect x="110" y="170" width="20" height="60"  fill="#26c281"/><line x1="120" y1="150" x2="120" y2="250" stroke="#26c281" stroke-width="2"/>
+      <rect x="160" y="120" width="20" height="55"  fill="#ff5d6c"/><line x1="170" y1="95"  x2="170" y2="190" stroke="#ff5d6c" stroke-width="2"/>
+      <rect x="210" y="150" width="20" height="80"  fill="#26c281"/><line x1="220" y1="130" x2="220" y2="250" stroke="#26c281" stroke-width="2"/>
+      <rect x="260" y="200" width="20" height="95"  fill="#ff5d6c"/><line x1="270" y1="175" x2="270" y2="320" stroke="#ff5d6c" stroke-width="2"/>
+      <rect x="310" y="225" width="20" height="70"  fill="#ff5d6c"/><line x1="320" y1="205" x2="320" y2="330" stroke="#ff5d6c" stroke-width="2"/>
+      <rect x="360" y="200" width="20" height="60"  fill="#26c281"/><line x1="370" y1="180" x2="370" y2="290" stroke="#26c281" stroke-width="2"/>
+      <rect x="410" y="170" width="20" height="65"  fill="#26c281"/><line x1="420" y1="150" x2="420" y2="255" stroke="#26c281" stroke-width="2"/>
+    </g>
+  </svg>
+
+  <div class="wrap">
+    <div>
+      <div class="pair"><span class="dot"></span>USD/JPY ライン分析ツール</div>
+      <h1>S/R<span class="accent">ライン</span>を<br>複数時間足で自動表示</h1>
+      <div class="sub">サポート・レジスタンス／★強度／マルチTF合流を<br>ひと目で。あなたのライン分析の“補助”に。</div>
+      <div class="chips">
+        <span class="chip r">R1 / R2 抵抗</span>
+        <span class="chip s">S1 / S2 支持</span>
+        <span class="chip g">★ 強度 ・ 合流</span>
+      </div>
+    </div>
+    <div class="foot">
+      <span class="url">usdjpy-sr-lines.netlify.app</span>
+      <span class="free">無料・登録不要</span>
+    </div>
+  </div>
+</body>
+</html>

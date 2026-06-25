@@ -6,6 +6,15 @@
 <title>運営者情報・このツールについて｜USD/JPY S/Rライン分析ツール</title>
 <meta name="description" content="USD/JPY S/Rライン分析ツールの運営者情報と、ツールを作った目的・データの出どころ・計算方法の概要について説明します。">
 <meta name="robots" content="index,follow">
+<meta property="og:title" content="運営者情報・このツールについて｜USD/JPY S/Rライン分析ツール">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://usdjpy-sr-lines.netlify.app/about.html">
+<meta property="og:image" content="https://usdjpy-sr-lines.netlify.app/ogp.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0e1420">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<link rel="manifest" href="site.webmanifest">
 <link rel="stylesheet" href="style.css">
 <!-- ▼ AdSenseは審査通過後にここへ ▼ -->
 </head>
@@ -33,7 +42,7 @@
   <ul>
     <li>価格データは外部の市場データAPIから取得した USD/JPY のレートを使用しています。</li>
     <li>ラインは「スイング高値・安値の抽出 → 近い価格帯のクラスタリング → 直近性・タッチ数による強度付け → 時間足間の合流判定」という手順で自動計算しています。</li>
-    <li>表示は<b>約5分ごと</b>に自動更新されます（リアルタイム配信ではありません）。</li>
+    <li>画面は約5分ごとに自動更新され、現在値や短い時間足は約5分ごとに最新化されます。長い時間足はその足の長さに応じて更新頻度を抑えています（リアルタイム配信ではありません）。詳しくは<a href="guide.html#pace" style="color:var(--accent)">更新ペース</a>をご覧ください。</li>
   </ul>
 
   <h2>運営方針</h2>

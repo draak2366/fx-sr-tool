@@ -1,0 +1,13 @@
+{
+  "name": "USD/JPY S/Rライン分析ツール",
+  "short_name": "S/Rライン",
+  "description": "USD/JPYのサポート・レジスタンスラインを複数時間足で自動表示する分析補助ツール",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0e1420",
+  "theme_color": "#0e1420",
+  "icons": [
+    { "src": "favicon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "favicon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
