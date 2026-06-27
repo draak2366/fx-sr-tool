@@ -18,7 +18,7 @@
 <link rel="apple-touch-icon" href="favicon-180.png">
 <link rel="manifest" href="site.webmanifest">
 <link rel="stylesheet" href="style.css">
-<!-- ▼ AdSenseは審査通過後にここへ ▼ -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7599057141433302" crossorigin="anonymous"></script>
 </head>
 <body>
 <div class="wrap">
@@ -260,6 +260,7 @@ function render(result){
 
 // データ取得：① config.dataUrl(GitHub raw) → ② ローカルsr.json → ③ サンプル
 async function loadData(){
+  _candlesCache = null;  // ローソク足も取り直す（毎回の自動更新で最新化）
   const bucket = Math.floor(Date.now() / 300000); // 5分バケツ（rawのキャッシュに合わせる）
   const sources = [];
   if (window.SR_CONFIG && SR_CONFIG.dataUrl) sources.push(SR_CONFIG.dataUrl + "?v=" + bucket);
