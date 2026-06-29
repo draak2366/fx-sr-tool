@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投稿用ツールカード（運営者用）｜USD/JPY S/Rライン分析</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="stylesheet" href="style.css">
+<style>
+  .share-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:12px 0;background:#0e1420}
+  .share-card svg{display:block;width:100%;height:auto}
+  .ta{width:100%;min-height:170px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--ink);
+      padding:12px;font-size:.95rem;font-family:inherit;line-height:1.6;white-space:pre-wrap}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+  .b{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:10px;padding:12px 18px;font-weight:800;font-size:.92rem;cursor:pointer;text-decoration:none}
+  .b.x{background:#1d9bf0;color:#fff}
+  .b.dl{background:var(--up);color:#06281a}
+  .b.cp{background:var(--panel2);color:var(--ink);border:1px solid var(--line)}
+  .steps{font-size:.86rem;color:#cdd6e6;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.35);border-radius:12px;padding:12px 16px;margin:14px 0}
+  .steps li{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap article">
+  <h1 style="font-size:1.3rem">📣 投稿用ツールカード <span style="font-size:.7rem;color:var(--sub)">（運営者用・非公開）</span></h1>
+  <p class="lead">現在のS/R速報カードと投稿文を自動生成します。下の手順でXに手動投稿してください（X API課金ゼロ）。</p>
+
+  <div class="steps">
+    <b>手順</b>
+    <ol>
+      <li>「🖼 画像を保存」でカード画像をダウンロード</li>
+      <li>「𝕏 投稿を開く」で文章入りの投稿画面を開く</li>
+      <li>その画面に保存した画像を添付して投稿</li>
+    </ol>
+    ※リンクは手動なので無料です。1日2〜4回（東京/ロンドン/NYオープン）が目安。
+  </div>
+
+  <div class="share-card" id="card"><div style="padding:40px;text-align:center;color:var(--sub)">読み込み中…</div></div>
+
+  <div class="btns">
+    <button class="b dl" id="dl">🖼 画像を保存</button>
+    <a class="b x" id="xpost" target="_blank" rel="noopener">𝕏 投稿を開く</a>
+    <button class="b cp" id="cp">📋 文章をコピー</button>
+    <button class="b cp" id="reload">🔄 最新に更新</button>
+  </div>
+
+  <textarea class="ta" id="text" readonly></textarea>
+
+  <p style="margin-top:20px"><a href="index.html" style="color:var(--accent)">← ツールに戻る</a></p>
+</div>
+
+<script src="config.js"></script>
+<script>
+const SITE = "https://usdjpy-sr-lines.netlify.app";
+const $ = id => document.getElementById(id);
+const f3 = n => (n==null ? "—" : Number(n).toFixed(3));
+const stars = r => "★".repeat(r||0);
+let lastData = null;
+
+function jstParts(){
+  const j = new Date(Date.now()+9*3600*1000);
+  return { mmdd:`${j.getUTCMonth()+1}/${j.getUTCDate()}`,
+    hhmm:`${String(j.getUTCHours()).padStart(2,"0")}:${String(j.getUTCMinutes()).padStart(2,"0")}` };
+}
+function pick(d){
+  const price=d.price, confs=d.confluence||[], h1=(d.timeframes&&d.timeframes["1h"])||{};
+  const r=confs.filter(c=>c.side==="R"&&c.price>price).sort((a,b)=>a.price-b.price)[0];
+  const s=confs.filter(c=>c.side==="S"&&c.price<price).sort((a,b)=>b.price-a.price)[0];
+  const strong=confs.slice().sort((a,b)=>b.count-a.count)[0];
+  return {
+    price,
+    R: r?{price:r.price,label:`${r.count}足合流`}:(h1.r1?{price:h1.r1.price,label:stars(h1.r1.rank)}:null),
+    S: s?{price:s.price,label:`${s.count}足合流`}:(h1.s1?{price:h1.s1.price,label:stars(h1.s1.rank)}:null),
+    strong: strong?{price:strong.price,n:strong.count,side:strong.side}:null,
+  };
+}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function buildSvg(d){
+  const {mmdd,hhmm}=jstParts(), L=pick(d);
+  const rTag=L.R?`<tspan fill="#3b82f6"> （${esc(L.R.label)}）</tspan>`:"";
+  const sTag=L.S?`<tspan fill="#3b82f6"> （${esc(L.S.label)}）</tspan>`:"";
+  const rPx=L.R?f3(L.R.price):"—", sPx=L.S?f3(L.S.price):"—";
+  const strong=L.strong?`強合流ゾーン ${f3(L.strong.price)}（${L.strong.n}足・${L.strong.side==="R"?"抵抗":"支持"}）`:"";
+  return `<svg viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI','Yu Gothic UI','Meiryo',sans-serif">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#141d2e"/><stop offset="1" stop-color="#0b1320"/></linearGradient></defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <rect x="8" y="8" width="1184" height="659" rx="22" fill="none" stroke="#26324a" stroke-width="2"/>
+  <circle cx="74" cy="62" r="11" fill="#26c281"/>
+  <text x="96" y="73" fill="#3b82f6" font-size="34" font-weight="800">USD/JPY ライン速報</text>
+  <text x="1140" y="73" fill="#aeb9cc" font-size="27" font-weight="700" text-anchor="end">${mmdd} ${hhmm} JST</text>
+  <text x="600" y="158" fill="#8a97ad" font-size="26" text-anchor="middle">現在値</text>
+  <text x="600" y="250" fill="#e7ecf5" font-size="104" font-weight="900" text-anchor="middle">${f3(L.price)}</text>
+  <rect x="120" y="296" width="960" height="80" rx="16" fill="#1d2740" stroke="#26324a"/>
+  <circle cx="168" cy="336" r="13" fill="#ff5d6c"/>
+  <text x="196" y="348" fill="#ff5d6c" font-size="32" font-weight="800">抵抗</text>
+  <text x="300" y="350" fill="#e7ecf5" font-size="44" font-weight="900">${rPx}${rTag}</text>
+  <rect x="120" y="392" width="960" height="80" rx="16" fill="#1d2740" stroke="#26324a"/>
+  <circle cx="168" cy="432" r="13" fill="#26c281"/>
+  <text x="196" y="444" fill="#26c281" font-size="32" font-weight="800">支持</text>
+  <text x="300" y="446" fill="#e7ecf5" font-size="44" font-weight="900">${sPx}${sTag}</text>
+  <text x="600" y="528" fill="#f5b942" font-size="29" font-weight="800" text-anchor="middle">🔗 ${esc(strong)}</text>
+  <text x="120" y="632" fill="#8a97ad" font-size="28" font-weight="800">usdjpy-sr-lines.netlify.app</text>
+  <rect x="902" y="604" width="178" height="44" rx="10" fill="#f5b942"/>
+  <text x="991" y="633" fill="#0e1420" font-size="23" font-weight="800" text-anchor="middle">無料・全6時間足</text>
+  </svg>`;
+}
+function buildText(d){
+  const {mmdd,hhmm}=jstParts(), L=pick(d), lines=[`【USD/JPY ライン速報】${mmdd} ${hhmm} JST`,`現在値 ${f3(L.price)}`];
+  if(L.R) lines.push(`🔴抵抗 ${f3(L.R.price)}（${L.R.label}）`);
+  if(L.S) lines.push(`🟢支持 ${f3(L.S.price)}（${L.S.label}）`);
+  if(L.strong) lines.push(`🔗強合流 ${f3(L.strong.price)}（${L.strong.n}足）`);
+  lines.push("","全6時間足のS/Rラインを無料で自動表示↓",SITE,"#ドル円 #USDJPY #FX #為替");
+  return lines.join("\n");
+}
+function downloadPng(){
+  const svg=$("card").querySelector("svg");
+  const xml=new XMLSerializer().serializeToString(svg);
+  const url="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(xml);
+  const img=new Image();
+  img.onload=()=>{
+    const c=document.createElement("canvas"); c.width=1200; c.height=675;
+    const x=c.getContext("2d"); x.drawImage(img,0,0,1200,675);
+    c.toBlob(b=>{ const a=document.createElement("a"); a.href=URL.createObjectURL(b);
+      a.download="usdjpy-line-"+Date.now()+".png"; a.click(); }, "image/png");
+  };
+  img.onerror=()=>alert("画像の生成に失敗しました。ブラウザを変えてお試しください。");
+  img.src=url;
+}
+function render(d){
+  lastData=d;
+  $("card").innerHTML=buildSvg(d);
+  const t=buildText(d);
+  $("text").value=t;
+  $("xpost").href="https://twitter.com/intent/tweet?text="+encodeURIComponent(t);
+}
+async function load(){
+  const bust=Date.now();
+  const sources=[];
+  if(window.SR_CONFIG&&SR_CONFIG.dataUrl) sources.push(SR_CONFIG.dataUrl+"?v="+bust);
+  sources.push("sr.json?t="+bust);
+  for(const u of sources){
+    try{ const r=await fetch(u,{cache:"no-store"}); if(!r.ok)continue;
+      const d=await r.json(); if(d&&d.price!=null){ render(d); return; } }catch(e){}
+  }
+  $("card").innerHTML='<div style="padding:40px;text-align:center;color:var(--down)">データ取得に失敗しました</div>';
+}
+$("dl").addEventListener("click",downloadPng);
+$("reload").addEventListener("click",load);
+$("cp").addEventListener("click",async()=>{ try{ await navigator.clipboard.writeText($("text").value);
+  $("cp").textContent="✅ コピーしました"; setTimeout(()=>$("cp").textContent="📋 文章をコピー",1500);}catch(e){ $("text").select(); }});
+load();
+</script>
+</body>
+</html>
