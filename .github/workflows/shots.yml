@@ -1,0 +1,56 @@
+name: shots
+
+on:
+  schedule:
+    - cron: "0 0 * * *"    # 09:00 JST 東京オープン   -> slot1
+    - cron: "0 7 * * *"    # 16:00 JST ロンドンオープン -> slot2
+    - cron: "0 12 * * *"   # 21:00 JST ロンドン-NY重複  -> slot3
+    - cron: "0 13 * * *"   # 22:00 JST ニューヨーク     -> slot4
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "手動実行で作るスロット番号(1-4)。空なら時刻から自動判定"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: shots
+  cancel-in-progress: false
+
+jobs:
+  shots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install playwright
+
+      - name: Install Chromium and Japanese fonts
+        run: |
+          npx playwright install --with-deps chromium
+          sudo apt-get install -y fonts-noto-cjk
+
+      - name: Generate card and text
+        env:
+          SLOT: ${{ github.event.inputs.slot }}
+        run: node make_shot.js
+
+      - name: Commit shots if changed
+        run: |
+          git config user.name "sr-bot"
+          git config user.email "sr-bot@users.noreply.github.com"
+          git add shots
+          if git diff --staged --quiet; then
+            echo "no change"
+          else
+            git commit -m "update shots [skip ci]"
+            git push
+          fi

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>本日の投稿スロット（運営者用）｜USD/JPY S/Rライン</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="stylesheet" href="style.css">
+<style>
+  .slot{border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0;background:var(--panel)}
+  .slot h3{font-size:1rem;margin:0 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .slot .when{font-size:.74rem;color:var(--sub);font-weight:700}
+  .slot img{width:100%;border-radius:10px;border:1px solid var(--line);display:block;background:#0e1420}
+  .ta{width:100%;min-height:150px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:11px;font-size:.9rem;font-family:inherit;line-height:1.6;white-space:pre-wrap;margin-top:10px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .b{border:none;border-radius:9px;padding:10px 16px;font-weight:800;font-size:.86rem;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+  .b.x{background:#1d9bf0;color:#fff}.b.dl{background:var(--up);color:#06281a}.b.cp{background:var(--panel2);color:var(--ink);border:1px solid var(--line)}
+  .miss{color:var(--sub);font-size:.85rem;padding:20px;text-align:center}
+  .replybox{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.35);border-radius:12px;padding:12px 14px;margin:12px 0}
+</style>
+</head>
+<body>
+<div class="wrap article">
+  <h1 style="font-size:1.25rem">📅 本日の投稿スロット <span style="font-size:.7rem;color:var(--sub)">（運営者用・非公開）</span></h1>
+  <p class="lead">各セッション時刻に自動生成されたカード画像と本文です（毎日上書き）。手で投稿する時間がずれても、ここから最新セットを取り出せます。</p>
+
+  <div class="replybox">
+    <b>リプ用（リンク）</b> — 投稿後に返信で貼る：
+    <textarea class="ta" id="reply" readonly style="min-height:64px">▼全6時間足のS/Rラインを無料で自動表示
+https://usdjpy-sr-lines.netlify.app</textarea>
+    <div class="row"><button class="b cp" id="cprep">💬 リプ文をコピー</button></div>
+  </div>
+
+  <div id="slots"></div>
+
+  <p style="margin-top:18px;font-size:.8rem;color:var(--sub)">※生成は GitHub の定期実行。時刻はやや前後/まれにスキップあり。出ていない時は <a href="share.html" style="color:var(--accent)">share.html</a>（常に最新をその場生成）を使ってください。</p>
+  <p><a href="index.html" style="color:var(--accent)">← ツールに戻る</a></p>
+</div>
+
+<script>
+const RAW = "https://raw.githubusercontent.com/draak2366/fx-sr-tool/main/shots/";
+const SLOTS = [
+  { n:1, label:"東京オープン", when:"09:00 JST" },
+  { n:2, label:"ロンドンオープン", when:"16:00 JST" },
+  { n:3, label:"ロンドン-NY重複", when:"21:00 JST" },
+  { n:4, label:"NYオープン", when:"22:00 JST" },
+];
+const $ = id => document.getElementById(id);
+const bust = Date.now();
+
+function intent(text){ return "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text); }
+
+async function buildSlot(s){
+  const wrap = document.createElement("div");
+  wrap.className = "slot";
+  let txt = null;
+  try{ const r = await fetch(RAW + `slot${s.n}.txt?cb=` + bust, {cache:"no-store"}); if(r.ok) txt = await r.text(); }catch(e){}
+  if(txt == null){
+    wrap.innerHTML = `<h3>スロット${s.n}：${s.label} <span class="when">${s.when}</span></h3><div class="miss">本日分まだ未生成</div>`;
+    return wrap;
+  }
+  wrap.innerHTML = `
+    <h3>スロット${s.n}：${s.label} <span class="when">${s.when}</span></h3>
+    <img src="${RAW}slot${s.n}.png?cb=${bust}" alt="card${s.n}">
+    <textarea class="ta" readonly>${txt.replace(/</g,"&lt;")}</textarea>
+    <div class="row">
+      <button class="b dl">🖼 画像を保存</button>
+      <a class="b x" target="_blank" rel="noopener" href="${intent(txt)}">𝕏 投稿を開く</a>
+      <button class="b cp">📋 本文をコピー</button>
+    </div>`;
+  wrap.querySelector(".dl").addEventListener("click", async ()=>{
+    try{ const res = await fetch(RAW + `slot${s.n}.png?cb=` + bust, {cache:"no-store"}); const b = await res.blob();
+      const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = `usdjpy-slot${s.n}.png`; a.click(); }catch(e){ alert("保存に失敗しました"); }
+  });
+  wrap.querySelector(".cp").addEventListener("click", async (e)=>{
+    try{ await navigator.clipboard.writeText(txt); e.target.textContent="✅ コピー"; setTimeout(()=>e.target.textContent="📋 本文をコピー",1500);}catch(err){}
+  });
+  return wrap;
+}
+
+(async ()=>{
+  const box = $("slots");
+  for(const s of SLOTS){ box.appendChild(await buildSlot(s)); }
+})();
+$("cprep").addEventListener("click", async ()=>{ try{ await navigator.clipboard.writeText($("reply").value);
+  $("cprep").textContent="✅ コピー"; setTimeout(()=>$("cprep").textContent="💬 リプ文をコピー",1500);}catch(e){} });
+</script>
+</body>
+</html>
