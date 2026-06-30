@@ -27,13 +27,14 @@
   <p class="lead">現在のS/R速報カードと投稿文を自動生成します。下の手順でXに手動投稿してください（X API課金ゼロ）。</p>
 
   <div class="steps">
-    <b>手順</b>
+    <b>手順（リーチ最大化のためリンクは本文に入れず、リプに付けます）</b>
     <ol>
       <li>「🖼 画像を保存」でカード画像をダウンロード</li>
-      <li>「𝕏 投稿を開く」で文章入りの投稿画面を開く</li>
-      <li>その画面に保存した画像を添付して投稿</li>
+      <li>「𝕏 投稿を開く」で文章入りの投稿画面を開く（本文はリンクなし）</li>
+      <li>保存した画像を添付して投稿</li>
+      <li>その投稿に「💬 リプ文をコピー」した文章で返信（＝リンクはここに）</li>
     </ol>
-    ※リンクは手動なので無料です。1日2〜4回（東京/ロンドン/NYオープン）が目安。
+    ※1日2〜4回（東京/ロンドン/NYオープン）が目安。プロフィール欄と固定ツイートにもリンクを常設すると効果的。
   </div>
 
   <div class="share-card" id="card"><div style="padding:40px;text-align:center;color:var(--sub)">読み込み中…</div></div>
@@ -41,11 +42,18 @@
   <div class="btns">
     <button class="b dl" id="dl">🖼 画像を保存</button>
     <a class="b x" id="xpost" target="_blank" rel="noopener">𝕏 投稿を開く</a>
-    <button class="b cp" id="cp">📋 文章をコピー</button>
+    <button class="b cp" id="cp">📋 本文をコピー</button>
     <button class="b cp" id="reload">🔄 最新に更新</button>
   </div>
 
+  <label style="font-size:.82rem;color:var(--sub);font-weight:700">本文（リンクなし・補助注記つき）</label>
   <textarea class="ta" id="text" readonly></textarea>
+
+  <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+    <label style="font-size:.82rem;color:var(--sub);font-weight:700;flex:1">リプ用（リンク）— 投稿後に返信で貼る</label>
+    <button class="b cp" id="cprep" style="padding:8px 14px">💬 リプ文をコピー</button>
+  </div>
+  <textarea class="ta" id="reply" readonly style="min-height:70px"></textarea>
 
   <p style="margin-top:20px"><a href="index.html" style="color:var(--accent)">← ツールに戻る</a></p>
 </div>
@@ -112,8 +120,11 @@ function buildText(d){
   if(L.R) lines.push(`🔴抵抗 ${f3(L.R.price)}（${L.R.label}）`);
   if(L.S) lines.push(`🟢支持 ${f3(L.S.price)}（${L.S.label}）`);
   if(L.strong) lines.push(`🔗強合流 ${f3(L.strong.price)}（${L.strong.n}足）`);
-  lines.push("","全6時間足のS/Rラインを無料で自動表示↓",SITE,"#ドル円 #USDJPY #FX #為替");
+  lines.push("","※分析の補助・目安です。投資は自己責任で","","#ドル円 #USDJPY #FX #為替");
   return lines.join("\n");
+}
+function buildReply(){
+  return `▼全6時間足のS/Rラインを無料で自動表示\n${SITE}`;
 }
 function downloadPng(){
   const svg=$("card").querySelector("svg");
@@ -134,6 +145,7 @@ function render(d){
   $("card").innerHTML=buildSvg(d);
   const t=buildText(d);
   $("text").value=t;
+  $("reply").value=buildReply();
   $("xpost").href="https://twitter.com/intent/tweet?text="+encodeURIComponent(t);
 }
 async function load(){
@@ -150,7 +162,9 @@ async function load(){
 $("dl").addEventListener("click",downloadPng);
 $("reload").addEventListener("click",load);
 $("cp").addEventListener("click",async()=>{ try{ await navigator.clipboard.writeText($("text").value);
-  $("cp").textContent="✅ コピーしました"; setTimeout(()=>$("cp").textContent="📋 文章をコピー",1500);}catch(e){ $("text").select(); }});
+  $("cp").textContent="✅ コピーしました"; setTimeout(()=>$("cp").textContent="📋 本文をコピー",1500);}catch(e){ $("text").select(); }});
+$("cprep").addEventListener("click",async()=>{ try{ await navigator.clipboard.writeText($("reply").value);
+  $("cprep").textContent="✅ コピー"; setTimeout(()=>$("cprep").textContent="💬 リプ文をコピー",1500);}catch(e){ $("reply").select(); }});
 load();
 </script>
 </body>
