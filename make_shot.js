@@ -23,16 +23,16 @@ function jstParts() {
   };
 }
 
+function footLabel(n) { return n >= 2 ? `${n}足合流` : `${n}足`; }
 function pick(d) {
   const price = d.price, confs = d.confluence || [], h1 = (d.timeframes && d.timeframes["1h"]) || {};
   const r = confs.filter((c) => c.side === "R" && c.price > price).sort((a, b) => a.price - b.price)[0];
   const s = confs.filter((c) => c.side === "S" && c.price < price).sort((a, b) => b.price - a.price)[0];
   const strong = confs.slice().sort((a, b) => b.count - a.count)[0];
-  const stars = (x) => "★".repeat(x || 0);
   return {
     price,
-    R: r ? { price: r.price, label: `${r.count}足合流` } : (h1.r1 ? { price: h1.r1.price, label: stars(h1.r1.rank) } : null),
-    S: s ? { price: s.price, label: `${s.count}足合流` } : (h1.s1 ? { price: h1.s1.price, label: stars(h1.s1.rank) } : null),
+    R: r ? { price: r.price, label: footLabel(r.count) } : (h1.r1 ? { price: h1.r1.price, label: footLabel(h1.r1.conf) } : null),
+    S: s ? { price: s.price, label: footLabel(s.count) } : (h1.s1 ? { price: h1.s1.price, label: footLabel(h1.s1.conf) } : null),
     strong: strong ? { price: strong.price, n: strong.count, side: strong.side } : null,
   };
 }
