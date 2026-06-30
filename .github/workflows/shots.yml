@@ -25,6 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # rebaseにマージ基点が必要なため全履歴を取得
 
       - uses: actions/setup-node@v4
         with:
@@ -53,14 +55,13 @@ jobs:
             exit 0
           fi
           git commit -m "update shots [skip ci]"
-          # build-srが同時にコミットしてpushが競合するため、rebaseして再試行
+          # build-srが同時にコミットしてpushが競合するため、pull --rebaseして再試行
           for i in 1 2 3 4 5; do
-            git fetch origin main
-            git rebase origin/main || { git rebase --abort; sleep 3; continue; }
-            if git push; then
+            if git pull --rebase origin main && git push; then
               echo "pushed"
               exit 0
             fi
+            git rebase --abort 2>/dev/null || true
             sleep 3
           done
           echo "push failed after retries"
