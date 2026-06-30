@@ -68,6 +68,11 @@ table.alltf .st{display:block;color:var(--gold);font-size:.64rem;line-height:1.1
 table.alltf td.mid{background:rgba(59,130,246,.14);color:var(--accent);font-weight:800}
 .touch-dot{display:inline-block;font-size:.6rem;background:var(--gold);color:#1a1207;border-radius:4px;padding:0 5px;margin-left:5px;font-weight:800;vertical-align:middle}
 
+/* 合流の並び替えトグル */
+.sortbtns{display:inline-flex;gap:4px}
+.sortbtns button{font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel2);color:var(--sub);cursor:pointer}
+.sortbtns button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
 /* チャート */
 .chart-panel{margin:8px 0 10px}
 #chart{height:300px;width:100%}

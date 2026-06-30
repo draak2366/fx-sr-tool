@@ -50,7 +50,12 @@
 
   <!-- 合流ライン -->
   <div class="panel">
-    <h2>🔗 マルチTF合流ライン（強い順）</h2>
+    <h2 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">🔗 マルチTF合流ライン
+      <span class="sortbtns" id="confsort">
+        <button data-sort="strong" class="active">強い順</button>
+        <button data-sort="near">近い順</button>
+      </span>
+    </h2>
     <div id="confluence"></div>
   </div>
 
@@ -99,9 +104,12 @@ function renderPrice(result){
   $("updated").textContent = "更新: " + t.toLocaleString("ja-JP");
 }
 
+let confSort = "strong";
 function renderConfluence(result){
   const box = $("confluence");
-  const list = result.confluence || [];
+  const list = (result.confluence || []).slice();
+  if(confSort === "near") list.sort((a,b)=> a.dist - b.dist);
+  else list.sort((a,b)=> (b.count - a.count) || (a.dist - b.dist));
   if(!list.length){ box.innerHTML = '<div class="empty">現在、複数時間足が重なる合流ラインはありません。</div>'; return; }
   box.innerHTML = list.map(c => `
     <div class="conf-item">
@@ -280,6 +288,13 @@ async function loadData(){
 }
 
 $("refresh").addEventListener("click", loadData);
+$("confsort").querySelectorAll("button").forEach(b=>{
+  b.addEventListener("click", ()=>{
+    confSort = b.dataset.sort;
+    $("confsort").querySelectorAll("button").forEach(x=>x.classList.toggle("active", x.dataset.sort===confSort));
+    if(lastResult) renderConfluence(lastResult);
+  });
+});
 renderTabs();
 loadData();
 setInterval(loadData, 5 * 60 * 1000);  // 5分ごとに自動更新
