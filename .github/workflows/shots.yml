@@ -50,7 +50,18 @@ jobs:
           git add shots
           if git diff --staged --quiet; then
             echo "no change"
-          else
-            git commit -m "update shots [skip ci]"
-            git push
+            exit 0
           fi
+          git commit -m "update shots [skip ci]"
+          # build-srが同時にコミットしてpushが競合するため、rebaseして再試行
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort; sleep 3; continue; }
+            if git push; then
+              echo "pushed"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "push failed after retries"
+          exit 1
