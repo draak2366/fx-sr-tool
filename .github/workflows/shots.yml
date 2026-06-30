@@ -49,6 +49,8 @@ jobs:
         run: |
           git config user.name "sr-bot"
           git config user.email "sr-bot@users.noreply.github.com"
+          # npm install が package.json を書き換えると pull --rebase が拒否されるため元に戻す
+          git checkout -- package.json 2>/dev/null || true
           git add shots
           if git diff --staged --quiet; then
             echo "no change"
